@@ -95,39 +95,60 @@
 初学时，只是copy网上的方法，对于前馈的引入，暴力的理解只要这么照抄“$PR_{out}+u_{ff}$”或者“$PI_{out}+u_{ff}$”引入就好了，但是从未从本质上理解原理。只带入PR内环时，目标电流$i_{ref}$与电网电压$V_{grid}$已经做到了同频同相，但是PR的输出$i_{grid}$与电网电压始终相差90°，原来的PR内环控制如下：
 ![Markdown](Pr_ctrl.png)
 ![Markdown](电流超前90.png)
+
 **极性的梳理：**
 图腾柱PFC的基础电气拓扑如下：
 ![Markdown](PFC.gif)
 定义AC端电压为$u_{grid}$，电感电压为$u_{L}$，输出端$C$与$R$并联，定义输出端电压为$u_{o}$
 由$KVL$定理可得：
+
 $$u_{grid} = u_{L}+u{o}$$
+
 $$u_{grid} = L\frac{di}{dt}+u{o}$$
+
 $$u_{grid} = L\frac{di}{dt}+{v_{conv}}^*$$
+
 $$u{o} = {v_{conv}}^*$$
+
 $$L\frac{di}{dt} = u_{grid} - {v_{conv}}^*$$
+
 ${v_{conv}}^*$为我电流环输出控制的电压，这也就是为什么外环控电流，内环控电压的说法。
 从这段关系式可以看出：
 $$L\frac{di}{dt} \uparrow \Longrightarrow {v_{conv}}^*\downarrow$$
-则：$$i_{grid}\uparrow \Longrightarrow {v_{conv}}^*\downarrow$$
-而模型定义：$$e = i_{ref} - i_{grid}$$
+
+则：
+$$i_{grid}\uparrow \Longrightarrow {v_{conv}}^*\downarrow$$
+
+而模型定义：
+$$e = i_{ref} - i_{grid}$$
+
 若$e>0$，说明$i_{gird}$偏小。
 需要增大$i_{gird}$，而$i_{gird}$增大，$u_{pr}$增大，${v_{conv}}^*$减小。
 所以，${v_{conv}}^*$与控制环路输出的正确关系应该是：
 $${v_{conv}}^* = u_{ff} - u_{pr}，{v_{conv}}^*\uparrow \Longrightarrow u_{pr}\downarrow$$
+
 而再看图1控制环路的错误案例：
 $${v_{conv}}^* = u_{ff} + u_{pr}$$
+
 盲目地引入前馈，而不注意各个参数的极性问题，导致${u_{conv}}^*$被错误的反馈回电路，$i_{grid}$也随之错误。
 当然，也可以从另一个角度去解析极性关系，这里带入我原本的电路模型，即L电感处模拟了含有**内阻R**，所以由KVL得：
 $$L\frac{di}{dt} = u_{grid} - {v_{conv}}^*-Ri_{grid}$$
+
 让电网电压视为扰动，令：$$u_{grid} = 0$$
 即：
 $$L\frac{di_{grid}}{dt} = - {v_{conv}}^*-Ri_{grid}$$
+
 $$L\frac{di_{grid}}{dt}+Ri_{grid} = - {v_{conv}}^*$$
+
 由拉普拉斯变换得：
 $$LsI_{grid}(s)+RI_{grid}(s) = -{U_{conv}}^*(s)$$
+
 $$I_{grid}(s)(Ls+R) = -{U_{conv}^*}(s)$$
+
 $$\frac{I_{grid}(s)}{{U_{conv}}^*(s)} = -\frac{1}{(Ls+R)}$$
+
 $$G_{p}(s) = -\frac{1}{(Ls+R)}$$
+
 这个直接反映了自控量${U_{conv}}^*$与因变量$I_{grid}$的关系，是成相反极性，也就是
 $$i_{grid}\uparrow \Longrightarrow {v_{conv}}^*\downarrow$$
 
